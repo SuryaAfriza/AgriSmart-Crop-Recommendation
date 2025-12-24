@@ -36,6 +36,7 @@ df = add_noise(df, noise_level=0.15)
 
 X = df.drop('label', axis=1)
 y = df['label']
+feature_names = X.columns.tolist() # Simpan nama fitur untuk plot nanti
 
 # Split Data (80% Latih, 20% Ujian)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -81,34 +82,46 @@ print("📊 Menghasilkan Metrik Evaluasi & Grafik...")
 y_pred_xgb = xgb_model.predict(X_test_scaled)
 y_pred_label = le.inverse_transform(y_pred_xgb)
 
-# Simpan Classification Report (Angka Precision/Recall/F1) ke JSON
+# Simpan Classification Report
 report = classification_report(y_test, y_pred_label, output_dict=True)
 with open('metrics_report.json', 'w') as f:
     json.dump(report, f)
 
-# Simpan Confusion Matrix sebagai Gambar
+# Simpan Confusion Matrix
 cm = confusion_matrix(y_test, y_pred_label)
-plt.figure(figsize=(10, 8))
-sns.heatmap(cm, annot=False, cmap='Blues', xticklabels=le.classes_, yticklabels=le.classes_)
+plt.figure(figsize=(12, 8))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=le.classes_, yticklabels=le.classes_)
 plt.title('Confusion Matrix (XGBoost)')
-plt.xlabel('Prediksi Model')
-plt.ylabel('Kenyataan (Aktual)')
 plt.xticks(rotation=90)
+plt.yticks(rotation=0)
 plt.tight_layout()
 plt.savefig('confusion_matrix.png')
 plt.close()
 
 # ==========================================
-# 5. EXPLAINABILITY (SHAP)
+# 5. EXPLAINABILITY (SHAP) 
 # ==========================================
-print("🔍 Membuat Analisis SHAP (Kenapa model memilih itu?)...")
+print("🔍 Membuat Analisis SHAP (Grafik Batang Bersih)...")
 explainer = shap.Explainer(xgb_model)
 shap_values = explainer(X_test_scaled)
 
-plt.figure()
-shap.summary_plot(shap_values, X_test, show=False)
-plt.savefig('shap_summary.png', bbox_inches='tight')
+# Rata-rata nilai absolut SHAP per fitur
+vals = np.abs(shap_values.values).mean(0) # Rata-rata per fitur per kelas
+if len(vals.shape) > 1: # Jika multiclass
+    vals = vals.sum(1) # Jumlahkan dampak semua kelas jadi satu angka "Importance"
+
+# Buat DataFrame sederhana untuk plotting
+feature_importance = pd.DataFrame(list(zip(feature_names, vals)), columns=['Fitur', 'Importance'])
+feature_importance.sort_values(by=['Importance'], ascending=True, inplace=True)
+
+# Plotting Manual Matplotlib 
+plt.figure(figsize=(10, 6))
+plt.barh(feature_importance['Fitur'], feature_importance['Importance'], color='#2E7D32') # Warna Hijau Tani
+plt.xlabel("Tingkat Kepentingan (Mean |SHAP Value|)")
+plt.title("Fitur yang Paling Mempengaruhi Prediksi")
+plt.grid(axis='x', linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.savefig('shap_summary.png')
 plt.close()
 
-print("\n✅ SELESAI! Semua file model (.pkl) dan gambar (.png) sudah siap.")
-print("   Sekarang kamu bisa jalankan: streamlit run app.py")
+print("\n✅ SELESAI! Cek file 'shap_summary.png'.")
