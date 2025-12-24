@@ -1,0 +1,20 @@
+Byte-compiled / optimized / DLL files
+
+pycache/
+*.py[cod]
+*$py.class
+
+Model files & Images (Kita generate ulang nanti, tidak perlu diupload agar repo ringan)
+
+*.pkl
+*.png
+*.json
+
+Virtual environment
+
+venv/
+env/
+
+Mac OS specific
+
+.DS_Store
