@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import joblib
 import json
-from PIL import Image
 
 # Konfigurasi Halaman Website
 st.set_page_config(page_title="AgriSmart - Rekomendasi Tani", layout="wide", page_icon="🌾")
@@ -12,7 +11,8 @@ st.set_page_config(page_title="AgriSmart - Rekomendasi Tani", layout="wide", pag
 st.markdown("""
     <style>
     .main { padding: 2rem; }
-    .stButton>button { width: 100%; border-radius: 5px; }
+    .stButton>button { width: 100%; border-radius: 5px; font-weight: bold; }
+    .metric-container { background-color: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -33,42 +33,61 @@ model_xgb, scaler, le, metrics = load_assets()
 
 # --- SIDEBAR (Menu Kiri) ---
 st.sidebar.title("🌾 AgriSmart")
-st.sidebar.caption("Sistem Cerdas Pertanian")
-menu = st.sidebar.radio("Pilih Menu", 
-    ["🏠 Home", "🔍 Prediksi Manual", "📂 Upload Excel/CSV", "📊 Laporan Evaluasi"])
+st.sidebar.caption("Sistem Pendukung Keputusan Petani")
+st.sidebar.markdown("---")
+menu = st.sidebar.radio("Navigasi Menu", 
+    ["🏠 Home", "🔍 Prediksi Manual", "📂 Upload Data Batch", "📊 Laporan Evaluasi"])
 
 # --- HALAMAN 1: HOME ---
 if menu == "🏠 Home":
     st.title("Selamat Datang di AgriSmart 🌱")
-    # Menggunakan gambar placeholder yang valid
-    st.image("https://plus.unsplash.com/premium_photo-1661962692059-55d5a4319814?q=80&w=1000&auto=format&fit=crop", use_column_width=True)
-    st.markdown("""
-    ### Solusi Gagal Panen dengan AI
-    Aplikasi ini membantu petani menentukan tanaman pangan yang tepat berdasarkan kondisi tanah dan iklim menggunakan Machine Learning.
     
-    **Fitur Utama:**
-    1.  **Analisis Tanah:** Mempertimbangkan Nitrogen, Fosfor, Kalium, dan pH.
-    2.  **Analisis Cuaca:** Mempertimbangkan Suhu, Kelembapan, dan Curah Hujan.
-    3.  **Akurasi Tinggi:** Menggunakan algoritma **XGBoost**.
+    # Gambar dihapus sesuai permintaan user
+
+    st.markdown("""
+    ### Solusi Gagal Panen dengan Kecerdasan Buatan (AI)
+    Aplikasi ini dirancang untuk membantu petani dan penyuluh pertanian dalam menentukan **jenis tanaman pangan yang paling optimal** untuk ditanam, menyesuaikan dengan profil kimia tanah dan kondisi iklim setempat.
+    
+    #### 🌟 Mengapa Aplikasi Ini Penting?
+    Pertanian tradisional seringkali mengandalkan intuisi yang bisa meleset. Dengan AgriSmart, keputusan bertani didasarkan pada data historis yang akurat.
+    
+    #### 🔍 Parameter Analisis (Fitur Input):
+    Aplikasi menganalisis 7 faktor kunci lingkungan:
+    1.  **Kandungan Tanah:**
+        * **Nitrogen (N):** Penting untuk pertumbuhan daun.
+        * **Fosfor (P):** Penting untuk akar dan pematangan buah.
+        * **Kalium (K):** Penting untuk ketahanan penyakit.
+        * **pH Tanah:** Tingkat keasaman lahan.
+    2.  **Kondisi Iklim:**
+        * **Temperatur:** Suhu rata-rata lingkungan.
+        * **Kelembapan:** Persentase uap air di udara.
+        * **Curah Hujan:** Ketersediaan air alami (mm).
+    
     """)
 
 # --- HALAMAN 2: PREDIKSI MANUAL ---
 elif menu == "🔍 Prediksi Manual":
     st.header("🔍 Cek Rekomendasi Tanaman")
-    st.write("Masukkan data tanah dan lingkungan secara manual:")
+    st.write("Masukkan data hasil uji tanah dan cuaca di bawah ini:")
     
+    # Membuat form input yang rapi dengan kolom
     col1, col2 = st.columns(2)
     with col1:
-        n = st.number_input("Nitrogen (N)", 0, 150, 50)
-        p = st.number_input("Phosphorous (P)", 0, 150, 50)
-        k = st.number_input("Potassium (K)", 0, 210, 50)
-        ph = st.number_input("pH Tanah (0-14)", 0.0, 14.0, 6.5)
+        st.subheader("1️⃣ Profil Tanah")
+        n = st.number_input("Kadar Nitrogen (N)", 0, 150, 50, help="Rasio kandungan Nitrogen dalam tanah")
+        p = st.number_input("Kadar Fosfor (P)", 0, 150, 50, help="Rasio kandungan Fosfor dalam tanah")
+        k = st.number_input("Kadar Kalium (K)", 0, 210, 50, help="Rasio kandungan Kalium dalam tanah")
+        ph = st.number_input("pH Tanah (0-14)", 0.0, 14.0, 6.5, help="Tingkat keasaman tanah")
+    
     with col2:
-        temp = st.number_input("Suhu (°C)", 0.0, 50.0, 26.0)
-        hum = st.number_input("Kelembapan (%)", 0.0, 100.0, 80.0)
+        st.subheader("2️⃣ Profil Iklim")
+        temp = st.number_input("Suhu Rata-rata (°C)", 0.0, 50.0, 26.0)
+        hum = st.number_input("Kelembapan Udara (%)", 0.0, 100.0, 80.0)
         rain = st.number_input("Curah Hujan (mm)", 0.0, 300.0, 200.0)
         
-    if st.button("🌱 Analisa Sekarang", type="primary"):
+    st.markdown("---")
+    
+    if st.button("🌱 Analisa Kesesuaian Lahan", type="primary"):
         if model_xgb:
             # Siapkan data input
             input_data = np.array([[n, p, k, temp, hum, ph, rain]])
@@ -78,15 +97,23 @@ elif menu == "🔍 Prediksi Manual":
             pred_idx = model_xgb.predict(input_scaled)[0]
             pred_label = le.inverse_transform([pred_idx])[0]
             
-            st.success(f"Tanaman yang paling cocok adalah: **{pred_label}**")
-            st.info(f"💡 Tips: Pastikan irigasi cukup jika memilih {pred_label}.")
+            st.success("Analisis Selesai! Berikut rekomendasinya:")
+            st.markdown(f"""
+            <div style="background-color: #d4edda; padding: 20px; border-radius: 10px; border-left: 5px solid #28a745;">
+                <h2 style="color: #155724; margin:0;">Tanaman Terbaik: {pred_label}</h2>
+                <p>Berdasarkan kombinasi NPK dan Curah Hujan yang Anda masukkan, lahan ini paling produktif jika ditanami <b>{pred_label}</b>.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
         else:
             st.error("⚠️ Model belum siap! Jalankan `python train_model.py` dulu di terminal.")
 
 # --- HALAMAN 3: UPLOAD CSV (Batch Prediction) ---
-elif menu == "📂 Upload Excel/CSV":
+elif menu == "📂 Upload Data Batch":
     st.header("📂 Prediksi Banyak Data Sekaligus")
-    uploaded_file = st.file_uploader("Upload file CSV data tanah", type=["csv"])
+    st.write("Gunakan fitur ini jika Anda memiliki data lahan dari banyak lokasi dalam format Excel/CSV.")
+    
+    uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
     
     if uploaded_file:
         try:
@@ -95,57 +122,65 @@ elif menu == "📂 Upload Excel/CSV":
             
             if st.button("Jalankan Prediksi Batch"):
                 required_cols = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
-                # Cek apakah kolom lengkap (case sensitive biasanya, tapi kita asumsikan user pakai format yg sama)
-                # Tips: Dataset asli pakai huruf kecil untuk temperature dkk, pastikan csv user sama.
                 
-                # Kita normalisasi nama kolom dulu biar aman
+                # Normalisasi nama kolom (hilangkan spasi)
                 df_upload.columns = [c.strip() for c in df_upload.columns]
                 
                 if all(col in df_upload.columns for col in required_cols):
-                    X_batch = scaler.transform(df_upload[required_cols])
-                    preds = model_xgb.predict(X_batch)
-                    df_upload['Hasil_Rekomendasi'] = le.inverse_transform(preds)
+                    # Progress bar biar keren
+                    with st.spinner('Sedang menganalisis ribuan data...'):
+                        X_batch = scaler.transform(df_upload[required_cols])
+                        preds = model_xgb.predict(X_batch)
+                        df_upload['Rekomendasi_Tanaman'] = le.inverse_transform(preds)
                     
-                    st.dataframe(df_upload)
+                    st.success("✅ Prediksi Selesai!")
+                    st.dataframe(df_upload.head)
                     
                     # Tombol Download
                     csv = df_upload.to_csv(index=False).encode('utf-8')
-                    st.download_button("📥 Download Hasil (CSV)", csv, "hasil_prediksi.csv", "text/csv")
+                    st.download_button(
+                        label="📥 Download Hasil Analisis (CSV)",
+                        data=csv,
+                        file_name="hasil_rekomendasi_pertanian.csv",
+                        mime="text/csv"
+                    )
                 else:
-                    st.error(f"Format salah! Pastikan ada kolom: {required_cols}")
+                    st.error(f"Format kolom salah! File CSV wajib memiliki kolom berikut: {required_cols}")
         except Exception as e:
             st.error(f"Terjadi kesalahan membaca file: {e}")
 
 # --- HALAMAN 4: EVALUASI (Untuk Laporan) ---
 elif menu == "📊 Laporan Evaluasi":
-    st.header("📊 Kinerja Model AI")
+    st.header("📊 Transparansi & Kinerja Model AI")
+    st.write("Halaman ini menyajikan metrik evaluasi teknis")
     
     if metrics:
-        # Metrik Angka
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Akurasi Total", f"{metrics['accuracy']*100:.1f}%")
-        c2.metric("Rata-rata Precision", f"{metrics['macro avg']['precision']*100:.1f}%")
-        c3.metric("Rata-rata Recall", f"{metrics['macro avg']['recall']*100:.1f}%")
+        # Metrik Angka dengan desain card
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Akurasi Model", f"{metrics['accuracy']*100:.1f}%", help="Persentase tebakan benar dari total data uji")
+        col2.metric("Macro Precision", f"{metrics['macro avg']['precision']*100:.1f}%", help="Tingkat ketepatan prediksi positif")
+        col3.metric("Macro Recall", f"{metrics['macro avg']['recall']*100:.1f}%", help="Tingkat keberhasilan menemukan kelas positif")
         
         st.markdown("---")
         
         # Grafik
-        tab1, tab2 = st.tabs(["Confusion Matrix", "SHAP Explainability"])
+        tab1, tab2 = st.tabs(["Confusion Matrix (Ketepatan)", "SHAP Values (Interpretasi)"])
         
         with tab1:
-            st.write("### Seberapa tepat tebakan model?")
+            st.write("#### Confusion Matrix")
+            st.write("Visualisasi ini menunjukkan di mana model sering melakukan kesalahan. Warna biru tua di diagonal menandakan prediksi yang sangat akurat.")
             try:
-                st.image("confusion_matrix.png")
-                st.caption("Semakin gelap warna diagonal, semakin bagus modelnya.")
+                st.image("confusion_matrix.png", caption="Confusion Matrix Model XGBoost", use_container_width=True)
             except:
-                st.warning("Gambar belum dibuat.")
+                st.warning("Gambar belum tersedia.")
                 
         with tab2:
-            st.write("### Faktor apa yang paling penting?")
+            st.write("#### Feature Importance (SHAP)")
+            st.write("Grafik ini menjawab pertanyaan: **'Faktor apa yang paling menentukan rekomendasi?'**")
             try:
-                st.image("shap_summary.png")
-                st.caption("Fitur paling atas = Paling mempengaruhi keputusan AI.")
+                st.image("shap_summary.png", caption="Faktor Dominan dalam Penentuan Tanaman", use_container_width=True)
+                st.info("💡 **Cara Membaca:** Fitur yang berada di urutan paling atas adalah fitur yang paling berpengaruh. Biasanya Curah Hujan atau Kelembapan menjadi faktor penentu utama.")
             except:
-                st.warning("Gambar belum dibuat.")
+                st.warning("Gambar belum tersedia.")
     else:
         st.error("Metrik belum tersedia. Jalankan training dulu.")
