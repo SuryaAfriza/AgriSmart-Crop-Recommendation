@@ -75,7 +75,7 @@ joblib.dump(xgb_model, 'model_xgboost.pkl')
 print("   Advanced model selesai.")
 
 # ==========================================
-# 4. EVALUASI & METRICS (Syarat Laporan)
+# 4. EVALUASI & METRICS
 # ==========================================
 print("📊 Menghasilkan Metrik Evaluasi & Grafik...")
 y_pred_xgb = xgb_model.predict(X_test_scaled)
