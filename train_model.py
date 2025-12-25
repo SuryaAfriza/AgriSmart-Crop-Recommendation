@@ -9,7 +9,7 @@ import json
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score
 
 # ==========================================
 # 1. LOAD & PREPROCESS DATA
@@ -31,7 +31,6 @@ except FileNotFoundError:
     print("⚠️ ERROR: File 'Crop_recommendation.csv' tidak ditemukan di folder ini!")
     exit()
 
-# Tambahkan noise agar akurasi turun dikit ke level realistis (misal ~98%)
 df = add_noise(df, noise_level=0.15)
 
 X = df.drop('label', axis=1)
@@ -81,6 +80,12 @@ print("   Advanced model selesai.")
 print("📊 Menghasilkan Metrik Evaluasi & Grafik...")
 y_pred_xgb = xgb_model.predict(X_test_scaled)
 y_pred_label = le.inverse_transform(y_pred_xgb)
+
+f1 = f1_score(y_test, y_pred_label, average='macro')
+acc = accuracy_score(y_test, y_pred_label)
+
+print(f"   Akurasi Akhir: {acc*100:.2f}%")
+print(f"   F1-Score Akhir: {f1*100:.2f}%")
 
 # Simpan Classification Report
 report = classification_report(y_test, y_pred_label, output_dict=True)

@@ -118,7 +118,7 @@ elif menu == "📂 Upload Data Batch":
     if uploaded_file:
         try:
             df_upload = pd.read_csv(uploaded_file)
-            st.write("Preview Data:", df_upload.head(3))
+            st.write("Preview Data:", df_upload.head(5))
             
             if st.button("Jalankan Prediksi Batch"):
                 required_cols = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
@@ -134,7 +134,7 @@ elif menu == "📂 Upload Data Batch":
                         df_upload['Rekomendasi_Tanaman'] = le.inverse_transform(preds)
                     
                     st.success("✅ Prediksi Selesai!")
-                    st.dataframe(df_upload.head)
+                    st.dataframe(df_upload)
                     
                     # Tombol Download
                     csv = df_upload.to_csv(index=False).encode('utf-8')
@@ -156,10 +156,11 @@ elif menu == "📊 Laporan Evaluasi":
     
     if metrics:
         # Metrik Angka dengan desain card
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Akurasi Model", f"{metrics['accuracy']*100:.1f}%", help="Persentase tebakan benar dari total data uji")
-        col2.metric("Macro Precision", f"{metrics['macro avg']['precision']*100:.1f}%", help="Tingkat ketepatan prediksi positif")
-        col3.metric("Macro Recall", f"{metrics['macro avg']['recall']*100:.1f}%", help="Tingkat keberhasilan menemukan kelas positif")
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Akurasi", f"{metrics['accuracy']*100:.1f}%", help="Persentase tebakan benar")
+        col2.metric("Precision", f"{metrics['macro avg']['precision']*100:.1f}%", help="Ketepatan prediksi positif")
+        col3.metric("Recall", f"{metrics['macro avg']['recall']*100:.1f}%", help="Keberhasilan menemukan kelas")
+        col4.metric("F1-Score", f"{metrics['macro avg']['f1-score']*100:.1f}%", help="Rata-rata harmonis Precision & Recall")
         
         st.markdown("---")
         
