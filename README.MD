@@ -2,8 +2,6 @@
 
 Sistem rekomendasi pertanian cerdas yang menggunakan **Machine Learning (XGBoost)** untuk membantu petani memilih jenis tanaman pangan yang paling optimal berdasarkan analisis unsur hara tanah (N, P, K) dan kondisi iklim mikro.
 
-Proyek ini disusun untuk memenuhi **Tugas Besar Mata Kuliah Machine Learning I**.
-
 ## 📌 Latar Belakang Masalah
 
 Kegagalan panen seringkali terjadi akibat ketidaksesuaian antara jenis tanaman dengan kondisi lahan. Petani membutuhkan alat bantu yang cepat dan akurat untuk mengambil keputusan tanam yang berbasis data (*data-driven decision making*).
@@ -69,30 +67,31 @@ python train_model.py
 streamlit run app.py
 ```
 
-Aplikasi akan otomatis terbuka di browser Anda (biasanya di `http://localhost:8501`).
+Aplikasi akan otomatis terbuka di browser di `http://localhost:8501`.
 
 ## ✨ Fitur Aplikasi
 
-1. **🏠 Home:** Dashboard informatif tentang proyek.
-2. **🔍 Prediksi Manual:** Input nilai N, P, K, dll secara manual untuk analisis cepat.
-3. **📂 Upload & Batch Prediction:** Upload file CSV berisi ratusan data tanah, sistem memprediksi semuanya sekaligus. Dilengkapi fitur **Download Hasil (CSV)**.
-4. **📊 Laporan Evaluasi:** Menampilkan transparansi model dengan metrik (Akurasi, Precision, Recall), Confusion Matrix, dan grafik **SHAP** untuk explainability.
+- **🏠 Home:** Dashboard informatif tentang proyek.
+- **🔍 Prediksi Manual:** Input nilai N, P, K, dll secara manual untuk analisis cepat.
+- **📂 Upload & Batch Prediction:** Upload file CSV berisi ratusan data tanah, sistem memprediksi semuanya sekaligus. Dilengkapi fitur **Download Hasil (CSV)**.
+- **📊 Laporan Evaluasi:** Menampilkan transparansi model dengan metrik (Akurasi, Precision, Recall), Confusion Matrix, dan grafik **SHAP** untuk explainability.
 
 ## 📊 Hasil Evaluasi Model
 
-Kami membandingkan dua algoritma untuk memastikan performa terbaik.
+Kami membandingkan dua algoritma dengan skenario **Noise Injection (15%)**  
+untuk menguji ketahanan model terhadap data sensor yang tidak sempurna.
 
-| Model | Akurasi | Keterangan |
-| ----- | ----- | ----- |
-| **Naive Bayes (Baseline)** | ~94.5% | Cepat, namun kurang akurat pada pola kompleks. |
-| **XGBoost (Advanced)** | **~98.7%** | Sangat akurat dan robust terhadap noise. |
+| Model                   | Akurasi | F1-Score | Keterangan |
+|-------------------------|--------:|---------:|------------|
+| Naive Bayes (Baseline)  | ~89.5%  | ~89.2%   | Cepat, namun sensitif terhadap noise |
+| XGBoost (Advanced)      | ~93.9%  | ~93.7%   | Sangat akurat dan robust |
 
 **Interpretabilitas (SHAP):**
 Fitur yang paling dominan mempengaruhi prediksi adalah **Curah Hujan (Rainfall)** dan **Kelembapan (Humidity)**, diikuti oleh unsur hara K dan N.
 
 ## 🛠️ Tech Stack
 
-* **Language:** Python
+* **Language:** Python 3.8+
 * **GUI Framework:** Streamlit
 * **Machine Learning:** Scikit-Learn, XGBoost
 * **Data Processing:** Pandas, NumPy
