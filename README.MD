@@ -1,28 +1,55 @@
 # 🌾 AgriSmart - Intelligent Crop Recommendation System
 
-Sistem rekomendasi pertanian cerdas yang menggunakan **Machine Learning (XGBoost)** untuk membantu petani memilih jenis tanaman pangan yang paling optimal berdasarkan analisis unsur hara tanah (N, P, K) dan kondisi iklim mikro.
+Sistem rekomendasi pertanian cerdas yang menggunakan **Machine Learning (XGBoost)** untuk membantu petani memilih jenis tanaman pangan yang paling optimal berdasarkan analisis unsur hara tanah (**N, P, K**) dan kondisi iklim mikro.
 
 Proyek ini disusun untuk memenuhi **Tugas Besar Mata Kuliah Machine Learning I**.
 
+---
+
 ## 📌 Latar Belakang Masalah
 
-Kegagalan panen seringkali terjadi akibat ketidaksesuaian antara jenis tanaman dengan kondisi lahan. Petani membutuhkan alat bantu yang cepat dan akurat untuk mengambil keputusan tanam yang berbasis data (*data-driven decision making*).
+Kegagalan panen seringkali terjadi akibat ketidaksesuaian antara jenis tanaman dengan kondisi lahan.  
+Petani membutuhkan alat bantu yang cepat dan akurat untuk mengambil keputusan tanam yang berbasis data (*data-driven decision making*).
 
-**Solusi:** Aplikasi ini memprediksi tanaman terbaik dengan menganalisis 7 parameter lingkungan.
+**Solusi:**  
+Aplikasi ini memprediksi tanaman terbaik dengan menganalisis **7 parameter lingkungan**.
+
+---
 
 ## 📂 Dataset
 
-* **Sumber:** Crop Recommendation Dataset (Public).
-* **Ukuran Data:** 2200 Baris Data.
-* **Fitur Input (7 Parameter):**
-  1. **Nitrogen (N):** Rasio nitrogen dalam tanah.
-  2. **Phosphorous (P):** Rasio fosfor dalam tanah.
-  3. **Potassium (K):** Rasio kalium dalam tanah.
-  4. **Temperature:** Suhu lingkungan (°C).
-  5. **Humidity:** Kelembapan udara (%).
-  6. **pH:** Tingkat keasaman tanah.
-  7. **Rainfall:** Curah hujan (mm).
-* **Target:** 22 Kelas Tanaman (Rice, Maize, Chickpea, Kidneybeans, Pigeonpeas, Mothbeans, Mungbean, Blackgram, Lentil, Pomegranate, Banana, Mango, Grapes, Watermelon, Muskmelon, Apple, Orange, Papaya, Coconut, Cotton, Jute, Coffee).
+- **Sumber:** Crop Recommendation Dataset (Public – Kaggle)  
+- **Ukuran Data:** 2200 baris data (balanced, 100 sampel per kelas)
+
+### 🔢 Fitur Input (7 Parameter)
+1. **Nitrogen (N)** – Rasio nitrogen dalam tanah  
+2. **Phosphorous (P)** – Rasio fosfor dalam tanah  
+3. **Potassium (K)** – Rasio kalium dalam tanah  
+4. **Temperature** – Suhu lingkungan (°C)  
+5. **Humidity** – Kelembapan udara (%)  
+6. **pH** – Tingkat keasaman tanah  
+7. **Rainfall** – Curah hujan (mm)
+
+### 🎯 Target
+22 kelas tanaman:
+Rice, Maize, Chickpea, Kidneybeans, Pigeonpeas, Mothbeans, Mungbean, Blackgram, Lentil,  
+Pomegranate, Banana, Mango, Grapes, Watermelon, Muskmelon, Apple, Orange, Papaya,  
+Coconut, Cotton, Jute, Coffee.
+
+---
+
+## 🚀 Cara Menjalankan (Instalasi Lokal)
+
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi di komputer Anda.
+
+---
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/USERNAME-KAMU/AgriSmart-Crop-Recommendation.git
+cd AgriSmart-Crop-Recommendation
+
 
 ## 🚀 Cara Menjalankan (Instalasi Lokal)
 
